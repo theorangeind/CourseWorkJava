@@ -39,16 +39,20 @@ public class TaskScheduler implements ITickable
         Process nextProcess = processQueue.getHighestPriorityProcess();
         if(nextProcess != null)
         {
-            if (cpu.runProcess(nextProcess))
+            if (cpu.hasFreeCore())
             {
                 processQueue.removeProcess(nextProcess);
+                cpu.runProcess(nextProcess);
             }
         }
 
         //random task scheduling
-        if(random.nextInt(10) == 0)
+        if(Configuration.randomProcessGenerationEnabled())
         {
-            scheduleRandom();
+            if (random.nextInt(10) == 0)
+            {
+                scheduleRandom();
+            }
         }
 
         //printTasks();
@@ -126,9 +130,7 @@ public class TaskScheduler implements ITickable
     {
         ArrayList<Process> result = new ArrayList<>();
         result.addAll(cpu.getCoresContent());
-        System.out.println("in cores:"+result.toString());
         result.addAll(processQueue.getList());
-        System.out.println("total:"+result.toString());
 
         return result;
     }

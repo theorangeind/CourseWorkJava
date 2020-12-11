@@ -7,7 +7,7 @@ public class NameGenerator
     private static String letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static String numbers = "1234567890";
     private static String specials = "_-";
-    private static String[] easterEggs = {"not-a-miner","miner","chrume","paint","Semens","winupdator","kursach"};
+    private static String[] easterEggs = {"not-a-miner","miner","chrume","paint","Simens","winupdator","kursach","codesus","rate100pls)"};
 
     private static Random random = new Random();
 

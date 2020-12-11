@@ -1,5 +1,6 @@
 package program.classes;
 
+import program.Configuration;
 import program.Main;
 import program.util.ITickable;
 
@@ -84,7 +85,13 @@ public class Resource implements ITickable
         {
             //System.out.println("Process " + currentTask.getName() + " has running on a resource " + getName() + " for " + timer + " ticks");
 
-            if (timer < processTime) timer++;
+            if (timer < processTime)
+            {
+                if(Configuration.runtimeErrorsEnabled() && random.nextInt(Configuration.getProcessTerminationChance()) == 0)
+                    simulateException();
+
+                timer++;
+            }
             else
             {
                 sendTaskToCPU();
@@ -92,6 +99,14 @@ public class Resource implements ITickable
                 setStatus(Status.READY);
             }
         }
+    }
+
+    public void simulateException()
+    {
+        queue.removeProcess(currentTask);
+        currentTask.setState(Process.State.TERMINATED);
+        currentTask.setInterruptionReason("Runtime Error (" + name + ")");
+        setStatus(Status.READY);
     }
 
     public ArrayList<Process> getTaskList()

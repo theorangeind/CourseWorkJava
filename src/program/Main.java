@@ -11,7 +11,6 @@ import program.classes.Resource;
 import program.classes.TaskScheduler;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Main extends Application
 {
@@ -21,6 +20,10 @@ public class Main extends Application
     private static CPU cpu;
     private static TaskScheduler taskScheduler;
     private static ArrayList<Resource> resources;
+
+    private static boolean running = false;
+    private static boolean firstRun = true;
+    private static boolean pause = false;
 
     @Override
     public void start(Stage primaryStage) throws Exception
@@ -32,77 +35,65 @@ public class Main extends Application
 
         guiController = loader.getController();
         guiController.initBaseTabs();
-        guiController.initResourcesBar(resources);
+        guiController.initControlButtons();
+        guiController.initTextFields();
+        guiController.initSliders();
+        guiController.initCheckBoxes();
 
         primaryStage.show();
     }
 
+    @Override
+    public void stop() throws Exception
+    {
+        super.stop();
+        finishWork();
+    }
 
     public static void main(String[] args)
     {
-        setupSystem();
-
-        Runnable r = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Scanner input = new Scanner(System.in);
-                while(true)
-                {
-                    int command = input.nextInt();
-                    if(command == 1)
-                    {
-                        System.out.println("New Task has been added to queue!");
-                        taskScheduler.scheduleRandom();
-                    }
-                    else if(command == 0)
-                    {
-                        System.out.println("Finishing work!");
-                        finishWork();
-                        break;
-                    }
-                    else System.out.println("Unknown command!");
-                }
-            }
-        };
-
-        Thread userInputThread = new Thread(r);
-        userInputThread.start();
-
         launch(args);
     }
 
-    private static void setupSystem()
+    public static void setupSystem()
     {
-        System.out.println("Starting system!");
+        System.out.println("Starting system.");
 
         cpu = new CPU(4);
-        taskScheduler = new TaskScheduler(cpu, Configuration.MEMORY_VOLUME);
+        taskScheduler = new TaskScheduler(cpu, Configuration.getMemoryVolume());
         systemClock = new ClockGenerator(cpu, taskScheduler);
         resources = new ArrayList<>();
-        for (int i = 0; i < Configuration.RESOURCES_COUNT; i++)
+        for (int i = 0; i < Configuration.getResourcesCount(); i++)
         {
             Resource r = new Resource("R" + (i + 1));
             resources.add(r);
             systemClock.attachSystemComponent(r);
         }
 
+        guiController.initResourcesBar(resources);
+
         systemClock.start();
+        running = true;
 
         System.out.println("System setup completed!");
+
+        firstRun = false;
     }
 
-    private static void finishWork()
+    public static void finishWork()
     {
         taskScheduler.finishWork();
         systemClock.finishWork();
+        running = false;
+        System.out.println("System shutdown.");
     }
 
     public static int getSystemTime()
     {
         return systemClock.getTime();
     }
+
+    public static ClockGenerator getSystemClock() { return systemClock; }
 
     public static TaskScheduler getTaskScheduler()
     {
@@ -113,4 +104,14 @@ public class Main extends Application
     {
         return resources;
     }
+
+    public static boolean isRunning() { return running; }
+
+    public static boolean isFirstRun() { return firstRun; }
+
+    /*--Cross-Thread methods--*/
+
+    public static synchronized boolean pauseActive() { return pause; }
+
+    public static synchronized void setPause(boolean value) { pause = value; }
 }

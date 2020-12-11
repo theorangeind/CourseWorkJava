@@ -65,7 +65,7 @@ public class Core implements ITickable
             {
                 if (random.nextInt(currentProcess.getBurstTime()) < percent*4)
                 {
-                    Resource r = Main.getSystemResources().get(random.nextInt(Configuration.RESOURCES_COUNT));
+                    Resource r = Main.getSystemResources().get(random.nextInt(Configuration.getResourcesCount()));
 
                     //System.out.println("Process " + currentProcess.getName() + " (id:" + currentProcess.getId() + ") has been send to " + r.getName());
 
@@ -76,7 +76,12 @@ public class Core implements ITickable
                 }
             }
 
-            //System.out.println("Process " + currentProcess.getName() + " (id:" + currentProcess.getId() + ") has burst time " + currentProcess.getBurstTime());
+            //runtime exception simulation
+            if(Configuration.runtimeErrorsEnabled() && random.nextInt(Configuration.getProcessTerminationChance()) == 0)
+            {
+                simulateException();
+                return;
+            }
 
             //mark process finished if it is completed
             if(currentProcess.getTimeRequired() <= currentProcess.getBurstTime())
@@ -84,6 +89,11 @@ public class Core implements ITickable
                 finishProcess("Completed.");
             }
         }
+    }
+
+    public void simulateException()
+    {
+        finishProcess("Runtime Error (CPU)");
     }
 
     public boolean isBusy()

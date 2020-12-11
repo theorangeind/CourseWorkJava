@@ -1,6 +1,7 @@
 package program.classes;
 
 import program.Configuration;
+import program.Main;
 import program.util.ITickable;
 
 import java.util.ArrayList;
@@ -10,15 +11,12 @@ public class ClockGenerator extends Thread
     ArrayList<ITickable> attachedComponents;
 
     private int currentTick = 0;
-    private int tps;
 
     private boolean running = false;
 
     public ClockGenerator(ITickable... attachedComponents)
     {
         this.attachedComponents = new ArrayList<>();
-
-        tps = Configuration.DEFAULT_CLOCK_TPS;
 
         for (ITickable item : attachedComponents)
         {
@@ -36,22 +34,29 @@ public class ClockGenerator extends Thread
     {
         running = true;
 
+        System.out.println("System clock is running.");
+
         while(running)
         {
-            try
+            if(!Main.pauseActive())
             {
-                Thread.sleep(Math.floorDiv(1000, tps));
-                for (ITickable item : attachedComponents)
+                try
                 {
-                    item.tick(currentTick);
+                    Thread.sleep(Math.floorDiv(1000, Configuration.getClockTps()));
+                    for (ITickable item : attachedComponents)
+                    {
+                        item.tick(currentTick);
+                    }
+                    currentTick++;
                 }
-                nextTick();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
+
+        System.out.println("System clock is stopped.");
     }
 
     public int getTime()
@@ -59,31 +64,21 @@ public class ClockGenerator extends Thread
         return currentTick;
     }
 
-    public void nextTick()
-    {
-        currentTick++;
-    }
-
-    public void addTicks(int count)
-    {
-        currentTick += count;
-    }
-
     public String getInfo()
     {
         return "";
     }
 
-    public boolean setTPS(int value)
-    {
-        if(value < 1 || value > 10) return false;
+    /*--external control--*/
 
-        tps = value;
-        return true;
+    public void nextTick()
+    {
+        for (ITickable item : attachedComponents)
+        {
+            item.tick(currentTick);
+        }
+        currentTick++;
     }
 
-    public void finishWork()
-    {
-        running = false;
-    }
+    public void finishWork() { running = false; }
 }

@@ -76,6 +76,11 @@ public class CPU implements ITickable
         return null;
     }
 
+    public boolean hasFreeCore()
+    {
+        return getFirstFreeCore() != null;
+    }
+
     public int getCoresCount()
     {
         return cores.length;
