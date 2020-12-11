@@ -122,6 +122,10 @@ public class TaskScheduler implements ITickable
 
     public void finishWork()
     {
+        for (Resource r : Main.getSystemResources())
+        {
+            r.finishWork();
+        }
         processQueue.clear();
         cpu.finishWork();
     }

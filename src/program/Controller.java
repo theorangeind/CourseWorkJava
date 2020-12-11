@@ -110,6 +110,10 @@ public class Controller
                     updateTable(Tables.RUNNING);
                     updateTable(Tables.REJECTED);
                     updateTable(Tables.FINISHED);
+                    btnRun.setDisable(true);
+                    btnPause.setDisable(false);
+                    btnStop.setDisable(false);
+                    btnCreate.setDisable(false);
                 }
             }
         });
@@ -120,6 +124,7 @@ public class Controller
                 if(!Main.isFirstRun())
                 {
                     Main.setPause(btnPause.isSelected());
+                    btnNext.setDisable(!btnPause.isSelected());
                 }
             }
         });
@@ -127,7 +132,7 @@ public class Controller
         btnNext.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if(Main.pauseActive()) Main.getSystemClock().nextTick();
+                Main.getSystemClock().nextTick();
             }
         });
 
@@ -135,6 +140,13 @@ public class Controller
             @Override
             public void handle(ActionEvent event) {
                 if(Main.isRunning()) Main.finishWork();
+                btnPause.setSelected(false);
+                btnRun.setDisable(false);
+                btnCreate.setDisable(true);
+                btnPause.setDisable(true);
+                btnNext.setDisable(true);
+                btnStop.setDisable(true);
+                updateTable(Tables.RUNNING);
             }
         });
 
@@ -144,6 +156,11 @@ public class Controller
                 openCreateProcessWindow();
             }
         });
+
+        btnPause.setDisable(true);
+        btnStop.setDisable(true);
+        btnCreate.setDisable(true);
+        btnNext.setDisable(true);
     }
 
     public void initTextFields()

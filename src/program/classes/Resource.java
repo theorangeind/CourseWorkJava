@@ -114,6 +114,12 @@ public class Resource implements ITickable
         return queue.getList();
     }
 
+    public void finishWork()
+    {
+        queue.clear();
+        currentTask = null;
+    }
+
     public enum Status
     {
         READY,
