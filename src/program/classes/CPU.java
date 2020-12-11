@@ -1,5 +1,6 @@
 package program.classes;
 
+import program.Main;
 import program.util.ITickable;
 
 import java.util.ArrayList;
@@ -7,6 +8,8 @@ import java.util.ArrayList;
 public class CPU implements ITickable
 {
     private Core[] cores;
+
+    private int inactivityTicks = 0;
 
     public CPU(final int coresNumber)
     {
@@ -20,9 +23,16 @@ public class CPU implements ITickable
     @Override
     public void tick(int currentTime)
     {
+        int freeCores = 0;
         for (Core core : cores)
         {
             core.tick(currentTime);
+            if(!core.isBusy()) freeCores++;
+        }
+        if(freeCores == cores.length)
+        {
+            inactivityTicks++;
+            Main.guiController.updateCPUInactivity();
         }
     }
 
@@ -76,6 +86,25 @@ public class CPU implements ITickable
         return null;
     }
 
+    public int getLowestPriorityIndex()
+    {
+        int lowestPriorityIndex = 0;
+        for (int i = 1; i < cores.length; i++)
+        {
+            if(cores[i].getRunningProcess().getPriority() > cores[lowestPriorityIndex].getRunningProcess().getPriority())
+            {
+                lowestPriorityIndex = i;
+            }
+        }
+        return lowestPriorityIndex;
+    }
+
+    public Core getCore(int index)
+    {
+        if(index > cores.length || index < 0) return null;
+        return cores[index];
+    }
+
     public boolean hasFreeCore()
     {
         return getFirstFreeCore() != null;
@@ -96,5 +125,10 @@ public class CPU implements ITickable
         }
 
         return result;
+    }
+
+    public int getInactivityTicks()
+    {
+        return inactivityTicks;
     }
 }

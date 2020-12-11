@@ -90,6 +90,49 @@
                               </AnchorPane>
                           </content>
                         </TitledPane>
+                        <TableView fx:id="tblResources" layoutX="202.0" prefHeight="206.0" prefWidth="600.0" />
+                        <Label layoutX="214.0" layoutY="218.0" text="System Time (ticks):">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="221.0" layoutY="272.0" text="Tasks finished:">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="221.0" layoutY="291.0" text="Tasks rejected:">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="216.0" layoutY="399.0" text="CPU inactivity (ticks):">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="216.0" layoutY="374.0" text="CPU queue size:">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="221.0" layoutY="322.0" text="Tasks total:">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lblTicks" layoutX="346.0" layoutY="220.0" text="0" />
+                        <Label fx:id="lblFinished" layoutX="346.0" layoutY="274.0" text="0" />
+                        <Label fx:id="lblRejected" layoutX="346.0" layoutY="293.0" text="0" />
+                        <Label fx:id="lblQueue" layoutX="346.0" layoutY="376.0" text="0" />
+                        <Label fx:id="lblInactivity" layoutX="346.0" layoutY="401.0" text="0" />
+                        <Label fx:id="lblTotal" layoutX="346.0" layoutY="323.0" text="0" />
+                        <Label layoutX="216.0" layoutY="448.0" text="Memory usage:">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lblMemory" layoutX="346.0" layoutY="450.0" text="0" />
                      </children>
                   </Pane>
                </content>

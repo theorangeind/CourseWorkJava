@@ -1,7 +1,5 @@
 package program.classes;
 
-import program.Main;
-
 import java.util.ArrayList;
 
 public class Queue
@@ -23,9 +21,9 @@ public class Queue
     {
         if(queue.isEmpty()) return null;
         int highestPriorityIndex = 0;
-        for (int i = 0; i < queue.size(); i++)
+        for (int i = 1; i < queue.size(); i++)
         {
-            if(queue.get(i).getPriority() > queue.get(highestPriorityIndex).getPriority())
+            if(queue.get(i).getPriority() < queue.get(highestPriorityIndex).getPriority())
                 highestPriorityIndex = i;
         }
         return queue.get(highestPriorityIndex);

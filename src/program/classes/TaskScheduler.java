@@ -21,6 +21,9 @@ public class TaskScheduler implements ITickable
 
     private int lastId = 1;
 
+    private int tasksFinished = 0;
+    private int tasksRejected = 0;
+
     public TaskScheduler(CPU cpu, int systemMemory)
     {
         this.cpu = cpu;
@@ -31,6 +34,7 @@ public class TaskScheduler implements ITickable
         rejectsList = new ArrayList<>();
 
         memoryScheduler.fillMemoryBlock(Configuration.OS_MEMORY_USAGE);
+        Main.guiController.updateMemoryUsage();
     }
 
     @Override
@@ -43,6 +47,15 @@ public class TaskScheduler implements ITickable
             {
                 processQueue.removeProcess(nextProcess);
                 cpu.runProcess(nextProcess);
+            }
+            else
+            {
+                Core lowestPriorityCore = cpu.getCore(cpu.getLowestPriorityIndex());
+                if(nextProcess.getPriority() < lowestPriorityCore.getRunningProcess().getPriority())
+                {
+                    processQueue.removeProcess(nextProcess);
+                    lowestPriorityCore.supplantProcess(nextProcess);
+                }
             }
         }
 
@@ -78,8 +91,20 @@ public class TaskScheduler implements ITickable
 
             processQueue.addProcess(task);
             task.setState(Process.State.READY);
-            //Main.guiController.updateTable(Controller.Tables.RUNNING);
+            task.setResource("");
+            Main.guiController.updateCPUQueue();
+
             return true;
+        }
+        else if(task.getState() == Process.State.READY)
+        {
+            if(task.getBurstTime() > 0)
+            {
+                processQueue.addProcess(task);
+                Main.guiController.updateCPUQueue();
+
+                return true;
+            }
         }
 
         MemoryBlock memory = memoryScheduler.fillMemoryBlock(task.getMemoryUsage());
@@ -93,6 +118,7 @@ public class TaskScheduler implements ITickable
         processQueue.addProcess(task);
         task.setState(Process.State.READY);
         //Main.guiController.updateTable(Controller.Tables.RUNNING);
+        Main.guiController.updateMemoryUsage();
 
         return true;
     }
@@ -106,18 +132,23 @@ public class TaskScheduler implements ITickable
     public void freeMemoryBlock(MemoryBlock block)
     {
         memoryScheduler.releaseMemoryBlock(block);
+        Main.guiController.updateMemoryUsage();
     }
 
     public void addProcessToCompleted(Process process)
     {
         completedList.add(process);
+        tasksFinished++;
         Main.guiController.updateTable(Controller.Tables.FINISHED);
+        Main.guiController.updateTasksFinished();
     }
 
     public void rejectProcess(Process process)
     {
         rejectsList.add(process);
+        tasksRejected++;
         Main.guiController.updateTable(Controller.Tables.REJECTED);
+        Main.guiController.updateTasksRejected();
     }
 
     public void finishWork()
@@ -154,6 +185,19 @@ public class TaskScheduler implements ITickable
         return completedList;
     }
 
+    public ArrayList<Process> getResourcesContent()
+    {
+        ArrayList<Process> result = new ArrayList<>();
+        result.addAll(cpu.getCoresContent());
+
+        for (Resource r : Main.getSystemResources())
+        {
+            result.add(r.getCurrentTask());
+        }
+
+        return result;
+    }
+
     public void printTasks()
     {
         System.out.println("==========================================================================");
@@ -174,5 +218,13 @@ public class TaskScheduler implements ITickable
     public void incrementLastId()
     {
         lastId++;
+        Main.guiController.updateTasksTotal();
     }
+
+    /*--Statistics--*/
+    public int getTasksFinished() { return tasksFinished; }
+    public int getTasksRejected() { return tasksRejected; }
+    public int getQueueLength() { return processQueue.getList().size(); }
+    public int getCPUInactivity() { return cpu.getInactivityTicks(); }
+    public int getMemoryUsage() { return memoryScheduler.getMemoryUsage(); }
 }

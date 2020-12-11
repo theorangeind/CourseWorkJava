@@ -1,6 +1,7 @@
 package program.classes;
 
 import program.Configuration;
+import program.Controller;
 import program.Main;
 import program.util.ITickable;
 
@@ -38,8 +39,11 @@ public class Resource implements ITickable
 
         timer = 0;
         currentTask = process;
+        currentTask.setResource(name);
         process.setState(Process.State.WAITING);
         processTime = Math.floorDiv(process.getTimeRequired(), 100) * random.nextInt(20) + 5;
+
+        Main.guiController.updateTable(Controller.Tables.RESOURCES);
 
         return true;
     }
@@ -66,6 +70,7 @@ public class Resource implements ITickable
 
     public void sendTaskToCPU()
     {
+        currentTask.setResource("");
         Main.getTaskScheduler().scheduleTask(currentTask);
         status = Status.READY;
     }
@@ -99,6 +104,8 @@ public class Resource implements ITickable
                 setStatus(Status.READY);
             }
         }
+
+        Main.guiController.updateTable(Controller.Tables.RESOURCES);
     }
 
     public void simulateException()
@@ -112,6 +119,11 @@ public class Resource implements ITickable
     public ArrayList<Process> getTaskList()
     {
         return queue.getList();
+    }
+
+    public Process getCurrentTask()
+    {
+        return currentTask;
     }
 
     public void finishWork()

@@ -1,6 +1,7 @@
 package program.classes;
 
 import program.Configuration;
+import program.Controller;
 import program.Main;
 import program.util.ITickable;
 
@@ -23,8 +24,10 @@ public class Core implements ITickable
     public void runProcess(Process process)
     {
         currentProcess = process;
+        currentProcess.setResource("CPU");
         currentProcess.setState(Process.State.RUNNING);
         busy = true;
+        Main.guiController.updateTable(Controller.Tables.RESOURCES);
     }
 
     private void finishProcess()
@@ -43,7 +46,20 @@ public class Core implements ITickable
     public void finishProcess(String reason)
     {
         currentProcess.setInterruptionReason(reason);
+        currentProcess.setResource("");
         finishProcess();
+    }
+
+    public void supplantProcess(Process newProcess)
+    {
+        currentProcess.setState(Process.State.READY);
+        Main.getTaskScheduler().scheduleTask(currentProcess);
+
+        //System.out.print(currentProcess.getName() + " (" + currentProcess.getPriority() + ")");
+
+        runProcess(newProcess);
+
+        //System.out.println(" was supplanted by " + newProcess.getName() + " (" + newProcess.getPriority() + ")");
     }
 
     public Process getRunningProcess()
@@ -88,6 +104,8 @@ public class Core implements ITickable
             {
                 finishProcess("Completed.");
             }
+
+            Main.guiController.updateTable(Controller.Tables.RESOURCES);
         }
     }
 

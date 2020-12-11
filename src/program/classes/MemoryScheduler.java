@@ -1,5 +1,7 @@
 package program.classes;
 
+import program.Main;
+
 import java.util.ArrayList;
 
 public class MemoryScheduler
@@ -70,6 +72,16 @@ public class MemoryScheduler
     {
         if(block == null) return false;
         return memoryBlocks.add(block);
+    }
+
+    public int getMemoryUsage()
+    {
+        int busy = 0;
+        for (MemoryBlock block : memoryBlocks)
+        {
+            busy += block.end - block.start;
+        }
+        return busy;
     }
 
     public int getAccessibleMemory()

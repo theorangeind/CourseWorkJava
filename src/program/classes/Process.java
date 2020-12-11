@@ -22,6 +22,8 @@ public class Process
 
     private MemoryBlock memoryBlock;
 
+    private String resource = "";
+
     private Random random = new Random();
 
     public Process(String name)
@@ -98,6 +100,8 @@ public class Process
         this.interruptionReason = value;
     }
 
+    public void setResource(String resourceName) { resource = resourceName; }
+
     /**--GETTERS--*/
     public int getId()
     {
@@ -142,6 +146,8 @@ public class Process
     {
         return interruptionReason;
     }
+
+    public String getResource() { return resource; }
 
     public enum State
     {

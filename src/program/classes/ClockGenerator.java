@@ -48,6 +48,7 @@ public class ClockGenerator extends Thread
                         item.tick(currentTick);
                     }
                     currentTick++;
+                    Main.guiController.updateTicks();
                 }
                 catch (Exception e)
                 {
@@ -78,6 +79,7 @@ public class ClockGenerator extends Thread
             item.tick(currentTick);
         }
         currentTick++;
+        Main.guiController.updateTicks();
     }
 
     public void finishWork() { running = false; }

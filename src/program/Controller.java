@@ -1,5 +1,6 @@
 package program;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +16,9 @@ import program.classes.Process;
 import program.classes.Resource;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Controller
 {
@@ -71,13 +75,33 @@ public class Controller
     CheckBox chkGeneration;
 
     /*--Tables--*/
+    @FXML
+    TableView tblResources;
     TableView tblRunning;
     TableView tblRejected;
     TableView tblFinished;
 
+    /*--Experiment Info--*/
+    @FXML
+    Label lblTicks;
+    @FXML
+    Label lblFinished;
+    @FXML
+    Label lblRejected;
+    @FXML
+    Label lblTotal;
+    @FXML
+    Label lblQueue;
+    @FXML
+    Label lblInactivity;
+    @FXML
+    Label lblMemory;
+
+
     ObservableList<Process> tblDataRunning = FXCollections.observableArrayList();
     ObservableList<Process> tblDataRejected = FXCollections.observableArrayList();
     ObservableList<Process> tblDataFinished = FXCollections.observableArrayList();
+    ObservableList<Process> tblDataResources = FXCollections.observableArrayList();
 
     ArrayList<ToggleButton> resourceButtons = new ArrayList<>();
 
@@ -114,6 +138,14 @@ public class Controller
                     btnPause.setDisable(false);
                     btnStop.setDisable(false);
                     btnCreate.setDisable(false);
+
+                    updateMemoryUsage();
+                    updateCPUQueue();
+                    updateTicks();
+                    updateCPUInactivity();
+                    updateTasksFinished();
+                    updateTasksRejected();
+                    updateTasksTotal();
                 }
             }
         });
@@ -338,6 +370,8 @@ public class Controller
 
         tblFinished = generateTableFinished();
         tabFinished.setContent(tblFinished);
+
+        generateTableResources();
     }
 
     public int getCurrentResourceTableIndex()
@@ -387,6 +421,31 @@ public class Controller
             tblDataFinished.setAll(Main.getTaskScheduler().getCompletedList());
             tblFinished.setItems(tblDataFinished);
 
+        }
+        else if(table == Tables.RESOURCES)
+        {
+            tblDataResources.setAll(Main.getTaskScheduler().getResourcesContent());
+            for (Object r: tblDataResources.toArray())
+            {
+                if(r == null)
+                {
+                    tblDataResources.remove(r);
+                    continue;
+                }
+                String res = ((Process)r).getResource();
+                if(res == "" || res.isEmpty()) tblDataResources.remove(r);
+            }
+            Set<Process> set = new HashSet<>(tblDataResources);
+            tblDataResources.clear();
+            tblDataResources.setAll(set);
+            tblDataResources.sort(new Comparator<Process>() {
+                @Override
+                public int compare(Process o1, Process o2) {
+                    return o1.getResource().compareTo(o2.getResource());
+                }
+            });
+
+            tblResources.setItems(tblDataResources);
         }
     }
 
@@ -479,10 +538,116 @@ public class Controller
         return tbl;
     }
 
+    private void generateTableResources()
+    {
+        TableColumn<Process, String> tblColResource;
+        TableColumn<Process, Integer> tblColId;
+        TableColumn<Process, String> tblColName;
+        TableColumn<Process, Integer> tblColMemory;
+        TableColumn<Process, Integer> tblColTime;
+        TableColumn<Process, String> tblColStatus;
+
+        tblColResource = new TableColumn<>("Resource");
+        tblColResource.setCellValueFactory(new PropertyValueFactory<>("resource"));
+        tblResources.getColumns().add(tblColResource);
+
+        tblColId = new TableColumn<>("ID");
+        tblColId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        tblResources.getColumns().add(tblColId);
+
+        tblColName = new TableColumn<>("Name");
+        tblColName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        tblResources.getColumns().add(tblColName);
+
+        tblColMemory = new TableColumn<>("Memory Usage");
+        tblColMemory.setCellValueFactory(new PropertyValueFactory<>("memoryUsage"));
+        tblResources.getColumns().add(tblColMemory);
+
+        tblColTime = new TableColumn<>("Run Time");
+        tblColTime.setCellValueFactory(new PropertyValueFactory<>("burstTime"));
+        tblResources.getColumns().add(tblColTime);
+
+        tblColStatus = new TableColumn<>("Status");
+        tblColStatus.setCellValueFactory(new PropertyValueFactory<>("state"));
+        tblResources.getColumns().add(tblColStatus);
+    }
+
+    public void updateTicks()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblTicks.setText(String.valueOf(Main.getSystemTime()));
+            }
+        });
+    }
+    public void updateTasksFinished()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblFinished.setText(String.valueOf(Main.getTaskScheduler().getTasksFinished()));
+            }
+        });
+    }
+    public void updateTasksRejected()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblRejected.setText(String.valueOf(Main.getTaskScheduler().getTasksRejected()));
+            }
+        });
+    }
+    public void updateTasksTotal()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblTotal.setText(String.valueOf(Main.getTaskScheduler().getLastId()));
+            }
+        });
+    }
+    public void updateCPUQueue()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblQueue.setText(String.valueOf(Main.getTaskScheduler().getQueueLength()));
+            }
+        });
+    }
+    public void updateCPUInactivity()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblInactivity.setText(String.valueOf(Main.getTaskScheduler().getCPUInactivity()));
+            }
+        });
+    }
+    public void updateMemoryUsage()
+    {
+        Platform.runLater(new Runnable() {
+
+            @Override
+            public void run() {
+                lblMemory.setText(String.valueOf(Main.getTaskScheduler().getMemoryUsage()));
+            }
+        });
+    }
+
     public enum Tables
     {
         RUNNING,
         REJECTED,
-        FINISHED
+        FINISHED,
+        RESOURCES
     }
 }
