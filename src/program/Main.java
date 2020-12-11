@@ -82,8 +82,8 @@ public class Main extends Application
 
     public static void finishWork()
     {
-        taskScheduler.finishWork();
-        systemClock.finishWork();
+        if(taskScheduler != null) taskScheduler.finishWork();
+        if(systemClock != null) systemClock.finishWork();
         running = false;
         System.out.println("System shutdown.");
     }
