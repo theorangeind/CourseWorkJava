@@ -37,7 +37,7 @@
                 <TableView prefHeight="200.0" prefWidth="200.0" />
              </content>
           </Tab>
-          <Tab fx:id="tabFinished" text="Completed">
+          <Tab fx:id="tabFinished" text="Finished">
              <content>
                 <TableView prefHeight="200.0" prefWidth="200.0" />
              </content>
@@ -148,7 +148,6 @@
             <ToggleButton fx:id="btnPause" mnemonicParsing="false" prefHeight="25.0" prefWidth="64.0" text="Pause" />
             <Button fx:id="btnNext" mnemonicParsing="false" prefHeight="24.0" prefWidth="64.0" text="Next" />
             <Button fx:id="btnStop" mnemonicParsing="false" prefHeight="24.0" prefWidth="64.0" text="Stop" />
-            <Button fx:id="btnHelp" mnemonicParsing="false" prefHeight="24.0" prefWidth="64.0" text="Help" />
         </items>
       </ToolBar>
    </center>
