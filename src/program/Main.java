@@ -32,6 +32,7 @@ public class Main extends Application
         Parent root = loader.load();
         primaryStage.setTitle("Course Work");
         primaryStage.setScene(new Scene(root, 800, 600));
+        primaryStage.setResizable(false);
 
         guiController = loader.getController();
         guiController.initBaseTabs();
